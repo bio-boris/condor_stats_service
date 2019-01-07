@@ -1,0 +1,17 @@
+module-name:
+    condor_stats
+
+module-description:
+    Get condor queue status
+
+service-language:
+    python
+
+module-version:
+    0.0.1
+
+owners:
+    [bsadkhin]
+
+service-config:
+    dynamic-service: true

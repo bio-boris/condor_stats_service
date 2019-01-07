@@ -1,4 +1,8 @@
-  [ {
+[ {
+  "module_name" : "condor_stats",
+  "type" : "core",
+  "file_path" : "https://raw.githubusercontent.com/bio-boris/condor_stats_service/master/condor_stats.spec"
+}, {
   "module_name" : "KBaseReport",
   "type" : "sdk",
   "version_tag" : "release"

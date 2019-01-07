@@ -26,7 +26,7 @@
         "service-mapping": {
             "url": "",
             "name": "condor_stats",
-            "method": "run_condor_stats",
+            "method": "queue_status",
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",

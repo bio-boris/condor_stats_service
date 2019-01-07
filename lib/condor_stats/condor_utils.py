@@ -168,7 +168,9 @@ def look_for_condor_container():
             names.append(line)
 
     if len(names) > 1:
-        sys.exit("Found too many container names" + str(names))
+        raise Exception("Found too many container names" + str(names))
+    elif len(names) == 0 :
+        raise Exception("Couldn't find any docker containers for condor")
     else:
         return str(names[0])
 

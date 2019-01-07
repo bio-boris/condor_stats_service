@@ -25,7 +25,7 @@ class condor_stats:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://bio-boris@github.com/bio-boris/condor_stats_service.git"
-    GIT_COMMIT_HASH = "62a79109d424a1c1161bc3da63002ac60d40a2cb"
+    GIT_COMMIT_HASH = "4cf924e2f83dd66f01affa39ab8c9631c77f4b15"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER

@@ -24,8 +24,8 @@ class condor_stats:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://bio-boris@github.com/bio-boris/condor_stats_service.git"
-    GIT_COMMIT_HASH = "4cf924e2f83dd66f01affa39ab8c9631c77f4b15"
+    GIT_URL = ""
+    GIT_COMMIT_HASH = ""
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -45,7 +45,8 @@ class condor_stats:
     def queue_status(self, ctx, params):
         """
         :param params: instance of mapping from String to String
-        :returns: instance of mapping from String to String
+        :returns: instance of type "ReportResults" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
         """
         # ctx is the context object
         # return variables are: output
@@ -63,7 +64,8 @@ class condor_stats:
     def job_status(self, ctx, params):
         """
         :param params: instance of mapping from String to String
-        :returns: instance of mapping from String to String
+        :returns: instance of type "ReportResults" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
         """
         # ctx is the context object
         # return variables are: output
@@ -77,6 +79,7 @@ class condor_stats:
                              'output is not type dict as required.')
         # return the results
         return [output]
+
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

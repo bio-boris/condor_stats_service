@@ -8,6 +8,6 @@ module condor_stats {
         string report_ref;
     } ReportResults;
 
-    funcdef queue_status(mapping<string,string> params) returns (ReportResults output) authentication required;
-    funcdef job_status(mapping<string,string> params) returns (ReportResults output) authentication required;
+    funcdef queue_status(mapping<string,string> params) returns (mapping<string,string> output) authentication required;
+    funcdef job_status(mapping<string,string> params) returns (mapping<string,string> output) authentication required;
 };

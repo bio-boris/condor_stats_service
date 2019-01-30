@@ -6,6 +6,50 @@ import re
 import subprocess
 import sys
 from collections import defaultdict
+import htcondor
+
+
+
+
+def connect():
+    hostname = getCondorConfig()
+    collector = htcondor.Collector(hostname)
+    collectors = collector.query(htcondor.AdTypes.Collector, "true", ["Name"])
+    numCollectors = len(collectors)
+    negotiators = collector.query(htcondor.AdTypes.Negotiator, "true", ["Name"])
+    numNegotiators = len(negotiators)
+    print(numCollectors)
+    print(numNegotiators)
+
+
+#TODO USE ENVIRONMENTAL VARIABLES
+
+def getCondorConfig():
+    condor_config_dir = "/etc/condor"
+    os.makedirs(condor_config_dir, exist_ok=True)
+    config_file = "{}/condor_config".format(condor_config_dir)
+    password_file = "{}/password".format(condor_config_dir)
+    password_binary = "/usr/sbin/condor_store_cred"
+
+
+    if not os.path.isfile(config_file):
+        with open(config_file, "w") as f:
+            lines = ["SEC_PASSWORD_FILE = {}", "SEC_CLIENT_AUTHENTICATION_METHODS = PASSWORD"]
+            f.writelines(lines)
+
+    password = "weakpassword"
+    if not os.path.isfile(password_file):
+        import subprocess
+        subprocess.check_output("{} -p '{}' -f {}".format(password_binary,password,password_file), shell=True)
+
+    return "ci.kbase.us:9618"
+
+
+
+
+
+
+
 
 
 def get_queue_stats(file=None):

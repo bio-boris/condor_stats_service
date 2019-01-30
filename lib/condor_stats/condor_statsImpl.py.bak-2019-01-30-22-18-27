@@ -4,7 +4,7 @@ import logging
 import os
 
 from installed_clients.KBaseReportClient import KBaseReport
-from .condor_utils import get_queue_stats,get_jobs_status,connect
+from .condor_utils import get_queue_stats,get_jobs_status
 #END_HEADER
 
 
@@ -25,7 +25,7 @@ class condor_stats:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://bio-boris@github.com/bio-boris/condor_stats_service.git"
-    GIT_COMMIT_HASH = "a4d8d48175bee58c111b744d87f5e3491c743f57"
+    GIT_COMMIT_HASH = "62a79109d424a1c1161bc3da63002ac60d40a2cb"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -50,11 +50,7 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN queue_status
-        #output = get_queue_stats()
-
-        connect()
-        output = {}
-
+        output = get_queue_stats()
         #END queue_status
 
         # At some point might do deeper type checking...
@@ -72,8 +68,7 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN job_status
-        #output = get_jobs_status(None)
-        output = {}
+        output = get_jobs_status(None)
         #END job_status
 
         # At some point might do deeper type checking...

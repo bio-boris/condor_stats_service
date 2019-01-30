@@ -6,13 +6,14 @@ import re
 import subprocess
 import sys
 from collections import defaultdict
-import htcondor
+
 
 
 
 
 def connect():
     hostname = getCondorConfig()
+    import htcondor
     collector = htcondor.Collector(hostname)
     collectors = collector.query(htcondor.AdTypes.Collector, "true", ["Name"])
     numCollectors = len(collectors)
@@ -25,6 +26,7 @@ def connect():
 #TODO USE ENVIRONMENTAL VARIABLES
 
 def getCondorConfig():
+
     condor_config_dir = "/etc/condor"
     os.makedirs(condor_config_dir, exist_ok=True)
     config_file = "{}/condor_config".format(condor_config_dir)
@@ -34,7 +36,7 @@ def getCondorConfig():
 
     if not os.path.isfile(config_file):
         with open(config_file, "w") as f:
-            lines = ["SEC_PASSWORD_FILE = {}", "SEC_CLIENT_AUTHENTICATION_METHODS = PASSWORD"]
+            lines = ["SEC_PASSWORD_FILE = {}\n".format(password_file), "SEC_CLIENT_AUTHENTICATION_METHODS = PASSWORD"]
             f.writelines(lines)
 
     password = "weakpassword"
@@ -43,6 +45,7 @@ def getCondorConfig():
         subprocess.check_output("{} -p '{}' -f {}".format(password_binary,password,password_file), shell=True)
 
     return "ci.kbase.us:9618"
+
 
 
 

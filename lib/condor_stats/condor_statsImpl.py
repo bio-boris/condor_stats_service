@@ -4,7 +4,10 @@ import logging
 import os
 
 from installed_clients.KBaseReportClient import KBaseReport
-from .condor_utils import get_queue_stats,get_jobs_status,connect
+from .utils.CondorUtils import CondorQueueInfo
+from installed_clients.authclient import KBaseAuth
+
+
 #END_HEADER
 
 
@@ -25,7 +28,7 @@ class condor_stats:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://bio-boris@github.com/bio-boris/condor_stats_service.git"
-    GIT_COMMIT_HASH = "a4d8d48175bee58c111b744d87f5e3491c743f57"
+    GIT_COMMIT_HASH = "370067c66cc662df1ba84d41c7e6009671160019"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -38,6 +41,9 @@ class condor_stats:
         self.serviceWizardURL = config['srv-wiz-url']
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
+        self.cq = CondorQueueInfo()
+        self.token = os.environ['KB_AUTH_TOKEN']
+        self.username = KBaseAuth(config['auth-service-url']).get_user(self.token)
         #END_CONSTRUCTOR
         pass
 
@@ -50,11 +56,7 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN queue_status
-        #output = get_queue_stats()
-
-        connect()
-        output = {}
-
+        output = self.cq.get_saved_queue_stats()
         #END queue_status
 
         # At some point might do deeper type checking...
@@ -72,13 +74,30 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN job_status
-        #output = get_jobs_status(None)
-        output = {}
+        output = self.cq.get_saved_job_stats(self.username)
         #END job_status
 
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method job_status return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def conder_userprio_all(self, ctx, params):
+        """
+        :param params: instance of mapping from String to String
+        :returns: instance of mapping from String to String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN conder_userprio_all
+        output = self.cq.get_saved_condor_userprio_all(self.username)
+        #END conder_userprio_all
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method conder_userprio_all return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]

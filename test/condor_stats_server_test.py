@@ -63,5 +63,6 @@ class condor_statsTest(unittest.TestCase):
         #
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
-        ret = self.serviceImpl.queue_status(self.ctx, {'workspace_name': self.wsName,
-                                                             'parameter_1': 'Hello World!'})
+        # ret = self.serviceImpl.queue_status(self.ctx, {'workspace_name': self.wsName,
+        #                                                      'parameter_1': 'Hello World!'})
+        pass

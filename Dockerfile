@@ -6,9 +6,12 @@ MAINTAINER KBase Developer
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
-RUN apt-get update &&  export DEBIAN_FRONTEND=noninteractive && apt-get install -y htcondor
-RUN pip install htcondor
-RUN rm -rf /etc/condor/*
+RUN apt-get update && apt-get install -y vim wget \
+&& wget -qO - https://research.cs.wisc.edu/htcondor/debian/HTCondor-Release.gpg.key | sudo apt-key add - \
+&& echo "deb http://research.cs.wisc.edu/htcondor/debian/8.8/stretch stretch contrib" >> /etc/apt/sources.list \
+&& apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y condor && rm -rf /etc/condor/*
+
+RUN mkdir -p /data/db && apt-get install -y mongodb && pip install htcondor pymongo
 
 
 # -----------------------------------------

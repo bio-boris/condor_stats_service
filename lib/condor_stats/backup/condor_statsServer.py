@@ -326,6 +326,11 @@ class Application(object):
                                    context['user_id'], context['module'],
                                    context['method'], context['call_id'])
 
+
+    def setupCondorConfig(self):
+        from condor_stats.CondorUtils import CondorUtils, get_queue_stats, get_client_group
+        CondorUtils()
+
     def __init__(self):
         submod = get_service_name() or 'condor_stats'
         self.userlog = log.log(
@@ -346,15 +351,15 @@ class Application(object):
                              name='condor_stats.job_status',
                              types=[dict])
         self.method_authentication['condor_stats.job_status'] = 'required'  # noqa
-        self.rpc_service.add(impl_condor_stats.conder_userprio_all,
-                             name='condor_stats.conder_userprio_all',
-                             types=[dict])
-        self.method_authentication['condor_stats.conder_userprio_all'] = 'required'  # noqa
         self.rpc_service.add(impl_condor_stats.status,
                              name='condor_stats.status',
                              types=[dict])
         authurl = config.get(AUTH) if config else None
         self.auth_client = _KBaseAuth(authurl)
+
+        self.setupCondorConfig()
+        print("ABOUT TO SET UP CONDOR COMPLETEs")
+
 
     def __call__(self, environ, start_response):
         # Context object, equivalent to the perl impl CallContext

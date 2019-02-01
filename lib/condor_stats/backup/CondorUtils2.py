@@ -6,51 +6,44 @@ import re
 import subprocess
 import sys
 from collections import defaultdict
-
-
-
-
-
-def connect():
-    hostname = getCondorConfig()
-    import htcondor
-    collector = htcondor.Collector(hostname)
-    collectors = collector.query(htcondor.AdTypes.Collector, "true", ["Name"])
-    numCollectors = len(collectors)
-    negotiators = collector.query(htcondor.AdTypes.Negotiator, "true", ["Name"])
-    numNegotiators = len(negotiators)
-    print(numCollectors)
-    print(numNegotiators)
-
+import htcondor
+import logging
 
 #TODO USE ENVIRONMENTAL VARIABLES
+#TODO USE CONFIG FILE ALSO
 
-def getCondorConfig():
+class CondorUtils:
 
-    condor_config_dir = "/etc/condor"
-    os.makedirs(condor_config_dir, exist_ok=True)
-    config_file = "{}/condor_config".format(condor_config_dir)
-    password_file = "{}/password".format(condor_config_dir)
-    password_binary = "/usr/sbin/condor_store_cred"
+    def __init__(self):
+        self.collector = self.get_condor_collector()
 
 
-    if not os.path.isfile(config_file):
-        with open(config_file, "w") as f:
-            lines = ["SEC_PASSWORD_FILE = {}\n".format(password_file), "SEC_CLIENT_AUTHENTICATION_METHODS = PASSWORD"]
-            f.writelines(lines)
-
-    password = "weakpassword"
-    if not os.path.isfile(password_file):
-        import subprocess
-        subprocess.check_output("{} -p '{}' -f {}".format(password_binary,password,password_file), shell=True)
-
-    return "ci.kbase.us:9618"
+    def get_queue_stats(self):
+        print(get_queue_stats())
+        return {'Queue_stats' : '1'}
 
 
+    def get_user_prio(self):
+        return {'User_prio' : '1'}
 
 
+    @staticmethod
+    def get_condor_collector():
+        hostname = CondorUtils.get_condor_hostname()
+        collector = htcondor.Collector(hostname)
+        collectors = collector.query(htcondor.AdTypes.Collector, "true", ["Name"])
+        numCollectors = len(collectors)
+        negotiators = collector.query(htcondor.AdTypes.Negotiator, "true", ["Name"])
+        numNegotiators = len(negotiators)
+        print(numCollectors)
+        print(numNegotiators)
+        return collector
 
-
+    @staticmethod
+    def get_condor_hostname():
+        hostname = "ci.kbase.us:9618"
+        CondorUtils.setup_condor()
+        return hostname
 
 
 

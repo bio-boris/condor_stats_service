@@ -9,6 +9,9 @@ if [ -f ./work/token ] ; then
 fi
 
 if [ $# -eq 0 ] ; then
+  service mongodb start
+  python ./lib/condor_stats/generate_condor_configs.py
+  python ./lib/condor_stats/generate_condor_dump.py
   sh ./scripts/start_server.sh
 elif [ "${1}" = "test" ] ; then
   echo "Run Tests"
@@ -25,3 +28,5 @@ elif [ "${1}" = "report" ] ; then
 else
   echo Unknown
 fi
+
+wait

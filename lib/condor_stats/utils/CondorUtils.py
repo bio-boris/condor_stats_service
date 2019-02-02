@@ -40,25 +40,36 @@ class CondorQueueInfo:
     Used for the IMPL to retrieve info from mongo
     '''
 
-    def get_username(self, ctx):
-        print(ctx)
-        return self.auth.get_user(ctx["token"])
+    def get_config(self):
+        if self.config is None:
+            self.config = self.load_config()
+        return self.config
 
-    #There has to be a better way..
+    def get_auth_client(self):
+        if self.auth is None:
+            config = self.config
+            if 'auth-service-url' in config:
+                auth_service_url = config['auth-service-url']
+            else:
+                auth_service_url = config['auth_service_url']
+            self.auth = KBaseAuth(auth_service_url)
+        return self.auth
+
+    def get_username(self, ctx):
+        return self.get_auth_client().get_user(ctx["token"])
+
+    # There has to be a better way..
     def load_config(self):
         retconfig = {}
         config = ConfigParser()
         config.read("/kb/module/work/config.properties")
-        for nameval in config.items('global'):
+        for nameval in config.items('global' or 'condor_stats'):
             retconfig[nameval[0]] = nameval[1]
         retconfig['auth-service-url'] = retconfig['auth_service_url']
         return retconfig
 
     def __init__(self, config=None):
-        if config is None:
-            config = self.load_config()
-
-        self.auth = KBaseAuth(config['auth-service-url'])
+        self.config = config
         self.mc = MongoClient('mongodb://localhost:27017/')
         self.condor_q_db = self.mc['condor_q']
         self.queue_status = self.condor_q_db['queue_status']
@@ -66,6 +77,7 @@ class CondorQueueInfo:
         self.user_prio = self.condor_q_db['user_prio']
         self.condor_q = None
         self.condor_user_prio_all = None
+        self.auth = None
 
     def get_condor_q_data(self):
         if self.condor_q is None:

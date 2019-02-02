@@ -3,10 +3,15 @@ import json
 import logging
 import re
 import subprocess
+from configparser import ConfigParser
+
 from collections import defaultdict
 
 from bson import json_util
 from pymongo import MongoClient
+
+# Find a way to use authclient from installed_clients..
+from .authclient import KBaseAuth
 
 job_status_codes = {
     5: 'Held',
@@ -19,7 +24,6 @@ job_status_codes = {
 }
 
 
-
 # TODO Get Condor QUeue Status
 # Get number of slots and add it to `get_saved_queue_stats`
 
@@ -30,8 +34,31 @@ job_status_codes = {
 
 
 class CondorQueueInfo:
+    '''
+    Used to generate queue info
+    Used to save queue info info mongo
+    Used for the IMPL to retrieve info from mongo
+    '''
 
-    def __init__(self):
+    def get_username(self, ctx):
+        print(ctx)
+        return self.auth.get_user(ctx["token"])
+
+    #There has to be a better way..
+    def load_config(self):
+        retconfig = {}
+        config = ConfigParser()
+        config.read("/kb/module/work/config.properties")
+        for nameval in config.items('global'):
+            retconfig[nameval[0]] = nameval[1]
+        retconfig['auth-service-url'] = retconfig['auth_service_url']
+        return retconfig
+
+    def __init__(self, config=None):
+        if config is None:
+            config = self.load_config()
+
+        self.auth = KBaseAuth(config['auth-service-url'])
         self.mc = MongoClient('mongodb://localhost:27017/')
         self.condor_q_db = self.mc['condor_q']
         self.queue_status = self.condor_q_db['queue_status']
@@ -218,11 +245,15 @@ class CondorQueueInfo:
         """
         return self.get_last_record_mongo(self.queue_status)
 
-    #TODO ADMIN TOKEN TO SEE ALL
-    def get_saved_job_stats(self, username):
+    # TODO ADMIN TOKEN TO SEE ALL
+    # TODO NO TOKEN = NO USERNAMES
+    def get_saved_job_stats(self, ctx):
         """
         Look up the job stats from mongo
         """
+
+        username = self.get_username(ctx)
+
         jobs = self.get_last_record_mongo(self.jobs)
         for row in jobs['rows']:
             if row['AcctGroup'] != username:
@@ -230,7 +261,7 @@ class CondorQueueInfo:
 
         return jobs
 
-    def get_saved_condor_userprio_all(self, username):
+    def get_saved_condor_userprio_all(self, ctx):
         """
         Look up the job stats from mongo
         """

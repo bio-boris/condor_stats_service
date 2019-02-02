@@ -41,9 +41,12 @@ class condor_stats:
         self.serviceWizardURL = config['srv-wiz-url']
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
-        self.cq = CondorQueueInfo()
-        self.token = os.environ['KB_AUTH_TOKEN']
-        self.username = KBaseAuth(config['auth-service-url']).get_user(self.token)
+
+        if 'KB_AUTH_TOKEN' in os.environ:
+            config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
+        self.config = config
+
+        self.cq = CondorQueueInfo(config)
         #END_CONSTRUCTOR
         pass
 
@@ -74,7 +77,7 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN job_status
-        output = self.cq.get_saved_job_stats(self.username)
+        output = self.cq.get_saved_job_stats(ctx)
         #END job_status
 
         # At some point might do deeper type checking...
@@ -92,7 +95,7 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN conder_userprio_all
-        output = self.cq.get_saved_condor_userprio_all(self.username)
+        output = self.cq.get_saved_condor_userprio_all(ctx)
         #END conder_userprio_all
 
         # At some point might do deeper type checking...

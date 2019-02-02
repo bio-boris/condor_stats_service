@@ -63,7 +63,7 @@ class CondorQueueInfo:
         retconfig = {}
         config = ConfigParser()
         config.read("/kb/module/work/config.properties")
-        for nameval in config.items('global' or 'condor_stats'):
+        for nameval in config.items('condor_stats' or 'global'):
             retconfig[nameval[0]] = nameval[1]
         retconfig['auth-service-url'] = retconfig['auth_service_url']
         return retconfig

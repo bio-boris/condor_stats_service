@@ -72,12 +72,16 @@ class CondorQueueInfo:
         self.config = config
         self.mc = MongoClient('mongodb://localhost:27017/')
         self.condor_q_db = self.mc['condor_q']
+
         self.queue_status = self.condor_q_db['queue_status']
         self.jobs = self.condor_q_db['jobs']
         self.user_prio = self.condor_q_db['user_prio']
+
         self.condor_q = None
         self.condor_user_prio_all = None
         self.auth = None
+
+
 
     def get_condor_q_data(self):
         if self.condor_q is None:
@@ -149,7 +153,7 @@ class CondorQueueInfo:
         return jobs
 
     # TODO REMOVE REGEX LOOKUP
-    def _queue_stats(self):
+    def _queue_stats(self,slot_stats):
         condor_q_data = self.get_condor_q_data()
 
         jobs_by_status = self._get_jobs_by_status(condor_q_data)
@@ -162,8 +166,9 @@ class CondorQueueInfo:
                     client_group = self._get_client_group(job)
                     client_groups[client_group][status] += 1
 
-        # Add zeroed out stats
-        for cg in client_groups:
+        # Grab all clientgroups based on the queues
+        # Add zeroed out stats for unavailable stats
+        for cg in slot_stats.keys():
             for code in job_status_codes.values():
                 if str(code) not in client_groups[cg]:
                     client_groups[cg][code] = 0
@@ -185,8 +190,9 @@ class CondorQueueInfo:
         Get the queue stats, save it to mongo.
         Old records deleted automatically based on index / created time
         """
-        queue_stats = self._queue_stats()
+
         slot_stats = self._slot_stats()
+        queue_stats = self._queue_stats(slot_stats)
 
         for cg in slot_stats.keys():
             queue_stats[cg]['total_slots'] = slot_stats[cg]['total_slots']
@@ -273,11 +279,12 @@ class CondorQueueInfo:
 
         return jobs
 
+    #TODO AUTHENTICATION THIS OR PURGE THIS
     def get_saved_condor_userprio_all(self, ctx):
         """
         Look up the job stats from mongo
         """
-        return self.condor_user_prio_all(self.jobs)
+        return self.get_last_record_mongo(self.user_prio)
 
 # from bson import json_util
 # from pymongo import MongoClient

@@ -28,7 +28,7 @@ class condor_stats:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://bio-boris@github.com/bio-boris/condor_stats_service.git"
-    GIT_COMMIT_HASH = "cbf14b766a0b67660d2df54ab2a848b6026cbc64"
+    GIT_COMMIT_HASH = "370067c66cc662df1ba84d41c7e6009671160019"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -87,20 +87,20 @@ class condor_stats:
         # return the results
         return [output]
 
-    def condor_userprio_all(self, ctx, params):
+    def conder_userprio_all(self, ctx, params):
         """
         :param params: instance of mapping from String to String
         :returns: instance of mapping from String to String
         """
         # ctx is the context object
         # return variables are: output
-        #BEGIN condor_userprio_all
+        #BEGIN conder_userprio_all
         output = self.cq.get_saved_condor_userprio_all(ctx)
-        #END condor_userprio_all
+        #END conder_userprio_all
 
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
-            raise ValueError('Method condor_userprio_all return value ' +
+            raise ValueError('Method conder_userprio_all return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]

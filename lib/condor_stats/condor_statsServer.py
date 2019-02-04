@@ -346,10 +346,10 @@ class Application(object):
                              name='condor_stats.job_status',
                              types=[dict])
         self.method_authentication['condor_stats.job_status'] = 'required'  # noqa
-        self.rpc_service.add(impl_condor_stats.conder_userprio_all,
-                             name='condor_stats.conder_userprio_all',
+        self.rpc_service.add(impl_condor_stats.condor_userprio_all,
+                             name='condor_stats.condor_userprio_all',
                              types=[dict])
-        self.method_authentication['condor_stats.conder_userprio_all'] = 'required'  # noqa
+        self.method_authentication['condor_stats.condor_userprio_all'] = 'required'  # noqa
         self.rpc_service.add(impl_condor_stats.status,
                              name='condor_stats.status',
                              types=[dict])

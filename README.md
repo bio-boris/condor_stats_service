@@ -24,3 +24,11 @@ To use this code in another SDK module, call `kb-sdk install condor_stats` in th
 # Help
 
 You may find the answers to your questions in our [FAQ](https://kbase.github.io/kb_sdk_docs/references/questions_and_answers.html) or [Troubleshooting Guide](https://kbase.github.io/kb_sdk_docs/references/troubleshooting.html).
+
+
+# Architecture
+
+Dynamic service has a mongodb store to keep a few records. Records are expired after 600 seconds (configurable with RECORD_EXPIRY_TIME_SECONDS) and deleted.
+Dynamic service has env variables ['COLLECTOR_HOST','CONDOR_HOST','POOL_PASSWORD','SCHEDD_HOST'] in order to run run condor_q, condor_status and condor_userprio on the condor hosts.
+Upon startup, dynamic service runs "Generate_data_dump" to dump condor_q data into service.
+A cronjob runs to generate fresh data every 5 minutes (configurable with CRONJOB_RUN_FREQUENCY_SECONDS)

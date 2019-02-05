@@ -295,7 +295,12 @@ class CondorQueueInfo:
                 cg = job_info['CLIENTGROUP']
                 job_info['JobsAhead'] = queue_stats[cg]['Idle']
 
+            #Possibly remove these to save space in json return object
             job_info['QDateHuman'] = str(datetime.datetime.utcfromtimestamp(job_info['QDate']))
+            job_info['JobStatusHuman'] = job_status_codes[job_info['JobStatus']]
+
+            for key in job_info:
+                job_info[key] = str(job_info[key])
 
             rows.append(job_info)
 

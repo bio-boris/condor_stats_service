@@ -12,7 +12,7 @@ from __future__ import print_function
 try:
     # baseclient and this client are in a package
     from .baseclient import BaseClient as _BaseClient  # @UnusedImport
-except ImportError:
+except:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
 
@@ -38,16 +38,27 @@ class condor_stats(object):
         :param params: instance of mapping from String to String
         :returns: instance of mapping from String to String
         """
-        return self._client.call_method('condor_stats.queue_status',
-                                        [params], self._service_ver, context)
+        return self._client.call_method(
+            'condor_stats.queue_status',
+            [params], self._service_ver, context)
 
     def job_status(self, params, context=None):
         """
         :param params: instance of mapping from String to String
         :returns: instance of mapping from String to String
         """
-        return self._client.call_method('condor_stats.job_status',
-                                        [params], self._service_ver, context)
+        return self._client.call_method(
+            'condor_stats.job_status',
+            [params], self._service_ver, context)
+
+    def condor_userprio_all(self, params, context=None):
+        """
+        :param params: instance of mapping from String to String
+        :returns: instance of mapping from String to String
+        """
+        return self._client.call_method(
+            'condor_stats.condor_userprio_all',
+            [params], self._service_ver, context)
 
     def status(self, context=None):
         return self._client.call_method('condor_stats.status',

@@ -10,8 +10,8 @@ fi
 
 if [ $# -eq 0 ] ; then
   service mongodb start
-  python ./lib/condor_stats/generate_condor_configs.py
-  python ./lib/condor_stats/generate_condor_dump.py
+  python /kb/module/lib/condor_stats/generate_condor_configs.py
+  bash /kb/module/lib/condor_stats/cronjob.sh &
   sh ./scripts/start_server.sh
 elif [ "${1}" = "test" ] ; then
   echo "Run Tests"

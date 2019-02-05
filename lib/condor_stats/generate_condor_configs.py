@@ -14,9 +14,10 @@ config_file = "{}/condor_config".format(condor_config_dir)
 password_file = "{}/password".format(condor_config_dir)
 password_binary = "/usr/sbin/condor_store_cred"
 
-schedd_host = os.environ.get("SCHEDD_HOST", "kbase@ci-dock")
-condor_host = os.environ.get("SCHEDD_HOST", "ci.kbase.us:9618")
-password = os.environ.get("POOL_PASSWORD", "weakpassword")
+schedd_host = os.environ.get("KBASE_SECURE_CONFIG_PARAM_SCHEDD_HOST", "kbase@ci-dock")
+condor_host = os.environ.get("KBASE_SECURE_CONFIG_PARAM_CONDOR_HOST", "ci.kbase.us:9618")
+password = os.environ.get("KBASE_SECURE_CONFIG_PARAM_POOL_PASSWORD", "weakpassword")
+
 
 if not os.path.isfile(config_file):
     logging.info("About to write config file")

@@ -31,20 +31,22 @@ user_prio = stats.condor_userprio_all({})
 job_status = stats.job_status({})
 
 
-print("=" * 50 + 'Queue Stats' + "=" * 50)
-print("")
-for i in queue_stats:
-	print("="* 50 + "{}".format(i) + "="*50)
-	print(queue_stats[i])
+#print("=" * 50 + 'Queue Stats' + "=" * 50)
+#print("")
+#for i in queue_stats:
+#	print("="* 50 + "{}".format(i) + "="*50)
+#	print(queue_stats[i])
+#
+#print("=" * 50 + 'User Prios' + "=" * 50)
+#for i in user_prio:
+#	print("="* 50 + "{}".format(i) + "="*50)
+#	print(user_prio[i])
+#
+#
+#print("=" * 50 + 'Job Stats' + "=" * 50)
 
-print("=" * 50 + 'User Prios' + "=" * 50)
-for i in user_prio:
-	print("="* 50 + "{}".format(i) + "="*50)
-	print(user_prio[i])
+#for row in job_status['rows']:
+#	print("="* 100 )
+#	print(row)
 
-
-print("=" * 50 + 'Job Stats' + "=" * 50)
-
-for row in job_status['rows']:
-	print("="* 100 )
-	print(row)
+print(job_status.keys())

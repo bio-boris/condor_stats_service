@@ -1,26 +1,38 @@
 #!/usr/bin/env python3
 import condor_statsClient
 
-#stats = condor_statsClient.condor_stats(url="http://localhost:5000/", token='7V72HVVLXTFD7QZN5XKEVZVVGBQXAXIG')
+
+def prRed(prt): print("\033[91m {}\033[00m".format(prt))
+
+
+def prGreen(prt): print("\033[92m {}\033[00m".format(prt))
+
+
+def prYellow(prt): print("\033[93m {}\033[00m".format(prt))
+
+
+def prLightPurple(prt): print("\033[94m {}\033[00m".format(prt))
+
+
+def prPurple(prt): print("\033[95m {}\033[00m".format(prt))
+
+
+def prCyan(prt): print("\033[96m {}\033[00m".format(prt))
+
+
+def prLightGray(prt): print("\033[97m {}\033[00m".format(prt))
+
+
+def prBlack(prt): print("\033[98m {}\033[00m".format(prt))
+
+
+# stats = condor_statsClient.condor_stats(url="http://localhost:5000/", token='7V72HVVLXTFD7QZN5XKEVZVVGBQXAXIG')
 
 url = "http://localhost:5000/"
-#url = "https://ci.kbase.us:443/dynserv/05e92d1b3477fe72f6f4ca18eedd25fb7dca9a23.condor-stats"
+# url = "https://ci.kbase.us:443/dynserv/05e92d1b3477fe72f6f4ca18eedd25fb7dca9a23.condor-stats"
+token = ''
 stats = condor_statsClient.condor_stats(url=url,
-					token='7V72HVVLXTFD7QZN5XKEVZVVGBQXAXIG')
-
-#
-# #print("Getting status")
-# #print()
-#
-# print("Getting queue_status")
-# print()
-#
-# #print("Getting user prio")
-# #print()
-#
-#
-# print("Getting job_status")
-# print(stats.job_status({}))
+                                        token=token)
 
 status = stats.status()
 
@@ -30,23 +42,21 @@ user_prio = stats.condor_userprio_all({})
 
 job_status = stats.job_status({})
 
+prRed("=" * 50 + 'Queue Stats' + "=" * 50)
+prRed("")
+for i in queue_stats:
+    prRed("=" * 50 + "{}".format(i) + "=" * 50)
+    prRed(queue_stats[i])
 
-#print("=" * 50 + 'Queue Stats' + "=" * 50)
-#print("")
-#for i in queue_stats:
-#	print("="* 50 + "{}".format(i) + "="*50)
-#	print(queue_stats[i])
-#
-#print("=" * 50 + 'User Prios' + "=" * 50)
-#for i in user_prio:
-#	print("="* 50 + "{}".format(i) + "="*50)
-#	print(user_prio[i])
-#
-#
-#print("=" * 50 + 'Job Stats' + "=" * 50)
+prYellow("=" * 50 + 'User Prios' + "=" * 50)
+for i in user_prio:
+    prYellow("=" * 50 + "{}".format(i) + "=" * 50)
+    prYellow(user_prio[i])
 
-#for row in job_status['rows']:
-#	print("="* 100 )
-#	print(row)
+prGreen("=" * 50 + 'Job Stats' + "=" * 50)
 
-print(job_status.keys())
+for row in job_status['rows']:
+    prGreen("=" * 100)
+    prYellow(row)
+
+prLightGray(job_status.keys())

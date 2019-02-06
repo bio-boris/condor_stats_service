@@ -58,7 +58,19 @@ class CondorQueueInfo:
         return self.auth
 
     def get_username(self, ctx) -> str:
-        return self.get_auth_client().get_user(ctx["token"])
+        if self.username is None:
+            self.username = self.get_auth_client().get_user(ctx["token"])
+        return self.username
+
+    def is_admin(self, ctx) -> bool:
+        """
+        Check to see if the user is an admin, as per defined in the ENV secure
+        :return:
+        """
+        username = self.get_username(ctx)
+        admins = os.environ.get("KBASE_SECURE_CONFIG_PARAM_ADMINISTRATORS", [])
+        if username in admins:
+            return True
 
     # There has to be a better way..
     @staticmethod
@@ -80,7 +92,10 @@ class CondorQueueInfo:
         self.jobs = self.condor_db['jobs']
         self.user_prio = self.condor_db['user_prio']
 
-        expire_after_seconds = os.environ.get("RECORD_EXPIRY_TIME_SECONDS", 120)
+        self.username = None
+
+        expire_after_seconds = os.environ.get(
+            "KBASE_SECURE_CONFIG_PARAM_RECORD_EXPIRY_TIME_SECONDS", 120)
 
         self.queue_status.ensure_index("created", expireAfterSeconds=expire_after_seconds)
         self.jobs.ensure_index("created", expireAfterSeconds=expire_after_seconds)
@@ -108,6 +123,7 @@ class CondorQueueInfo:
         return self._condor_q
 
     def get_condor_status_data(self) -> dict:
+
         if self._condor_user_prio_all is None:
             self._condor_user_prio_all = self._get_user_prio_allusers()
         return self._condor_user_prio_all
@@ -196,7 +212,7 @@ class CondorQueueInfo:
         return client_groups
 
     @staticmethod
-    def _get_last_record_mongo(collection):
+    def _get_last_record_mongo(collection) -> dict:
         try:
             item = collection.find().limit(1).sort('created', -1)[0]
             item['_id'] = str(item['_id'])
@@ -204,24 +220,25 @@ class CondorQueueInfo:
             return item
         except Exception as e:
             logging.error(e)
-            return {'e': str(e), 'msg': 'no records are available for collection:' + collection.name}
+            return {'e': str(e),
+                    'msg': 'no records are available for collection:' + collection.name}
 
-    def get_saved_queue_stats(self):
+    def get_saved_queue_stats(self) -> dict:
         """
         Look up the queue stats from mongo
         """
         return self._get_last_record_mongo(self.queue_status)
 
-    # TODO ADMIN TOKEN TO SEE ALL
-    # TODO NO TOKEN = NO USERNAMES
-    def get_saved_job_stats(self, ctx):
+    def get_saved_job_stats(self, ctx) -> dict:
         """
         Look up the job stats from mongo. If the user is not an admin, remove usernames from the list
         """
+        jobs = self._get_last_record_mongo(self.jobs)
+
+        if self.is_admin(ctx):
+            return jobs
 
         username = self.get_username(ctx)
-
-        jobs = self._get_last_record_mongo(self.jobs)
 
         if 'rows' in jobs:
             for row in jobs['rows']:
@@ -231,10 +248,13 @@ class CondorQueueInfo:
         return jobs
 
     # TODO AUTHENTICATION THIS OR PURGE THIS
-    def get_saved_condor_userprio_all(self, ctx):
+    def get_saved_condor_userprio_all(self, ctx) -> dict:
         """
         Look up the job stats from mongo
         """
+        if not self.is_admin(ctx):
+            return {'msg': 'Sorry you are not condor_stats admin'}
+
         return self._get_last_record_mongo(self.user_prio)
 
     def save_user_prio(self) -> None:
@@ -243,6 +263,7 @@ class CondorQueueInfo:
         Old records deleted automatically based on index / created time
         :return:
         """
+
         get_user_prio_allusers = self._get_user_prio_allusers()
         get_user_prio_allusers['created'] = datetime.datetime.utcnow()
         self.user_prio.insert_one(get_user_prio_allusers)
@@ -295,7 +316,7 @@ class CondorQueueInfo:
                 cg = job_info['CLIENTGROUP']
                 job_info['JobsAhead'] = queue_stats[cg]['Idle']
 
-            #Possibly remove these to save space in json return object
+            # Possibly remove these to save space in json return object
             job_info['QDateHuman'] = str(datetime.datetime.utcfromtimestamp(job_info['QDate']))
             job_info['JobStatusHuman'] = job_status_codes[job_info['JobStatus']]
 

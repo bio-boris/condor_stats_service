@@ -1,16 +1,17 @@
 import datetime
 import json
 import logging
+import os
 import re
 import subprocess
 from collections import defaultdict
 from configparser import ConfigParser
 from typing import Dict
-import os
 
 from pymongo import MongoClient
 
-# Find a way to use authclient from installed_clients..
+# Find a way to use authclient/catalog from installed_clients instead of copying them?
+from .CatalogClient import Catalog
 from .authclient import KBaseAuth
 
 job_status_codes = {
@@ -57,6 +58,16 @@ class CondorQueueInfo:
             self.auth = KBaseAuth(auth_service_url)
         return self.auth
 
+    def get_catalog_client(self, ctx) -> Catalog:
+        if self.catalog_client is None:
+            config = self.config
+            if 'kbase-endpoint' in config:
+                catalog_service_url = config['kbase-endpoint'] + "/catalog"
+            else:
+                catalog_service_url = config['kbase_endpoint'] + "/catalog"
+            self.catalog_client = Catalog(url=catalog_service_url)
+        return self.catalog_client
+
     def get_username(self, ctx) -> str:
         if self.username is None:
             self.username = self.get_auth_client().get_user(ctx["token"])
@@ -68,9 +79,8 @@ class CondorQueueInfo:
         :return:
         """
         username = self.get_username(ctx)
-        admins = os.environ.get("KBASE_SECURE_CONFIG_PARAM_ADMINISTRATORS", [])
-        if username in admins:
-            return True
+        cc = self.get_catalog_client(ctx)
+        return cc.is_admin(username)
 
     # There has to be a better way..
     @staticmethod
@@ -105,7 +115,9 @@ class CondorQueueInfo:
         self._condor_user_prio_all = None
         self._queue_stats = None
         self.auth = None
+        self.catalog_client = None
         self._slot_stats = None
+        self._discovered_client_groups = defaultdict(int)
 
     def get_slot_stats(self) -> dict:
         if self._slot_stats is None:
@@ -189,18 +201,9 @@ class CondorQueueInfo:
 
     # TODO REMOVE REGEX LOOKUP
     def _gen_queue_stats(self) -> dict:
-        slot_stats = self.get_slot_stats()
         condor_q_data = self.get_condor_q_data()
-
         jobs_by_status = self._get_jobs_by_status(condor_q_data)
         client_groups = defaultdict(lambda: defaultdict(int))
-
-        # Grab all clientgroups based on the queues
-        # Add zeroed out stats for unavailable stats
-        for cg in slot_stats.keys():
-            for code in job_status_codes.values():
-                client_groups[cg][code] = 0
-
 
         for status in jobs_by_status.keys():
             jobs = jobs_by_status[status]
@@ -208,8 +211,6 @@ class CondorQueueInfo:
                 if 'Requirements' in job:
                     client_group = self._get_client_group(job)
                     client_groups[client_group][status] += 1
-
-
 
         return client_groups
 
@@ -279,10 +280,19 @@ class CondorQueueInfo:
         slot_stats = self.get_slot_stats()
         queue_stats = self.get_queue_stats()
 
-        for cg in slot_stats.keys():
-            queue_stats[cg]['total_slots'] = slot_stats[cg]['total_slots']
-            queue_stats[cg]['free_slots'] = slot_stats[cg]['free_slots']
-            queue_stats[cg]['used_slots'] = slot_stats[cg]['used_slots']
+        # Grab all clientgroups based on the jobs and slots currently in the queue
+        # Add zeroed out stats for unavailable stats
+        all_keys = set().union(queue_stats.keys(), slot_stats.keys())
+        for cg in all_keys:
+            for code in job_status_codes.values():
+                if str(code) not in queue_stats[cg]:
+                    queue_stats[cg][code] = 0
+
+        for cg in all_keys:
+            for header in ['total_slots', 'free_slots', 'used_slots']:
+                queue_stats[cg][header] = 0
+                if header in slot_stats[cg]:
+                    queue_stats[cg][header] = slot_stats[cg][header]
 
         queue_stats['created'] = datetime.datetime.utcnow()
         self.queue_status.insert_one(queue_stats)

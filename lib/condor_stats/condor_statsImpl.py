@@ -41,15 +41,11 @@ class condor_stats:
         self.serviceWizardURL = config['srv-wiz-url']
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
-
-        if 'KB_AUTH_TOKEN' in os.environ:
-            config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
         self.config = config
 
-        self.cq = CondorQueueInfo(config)
+
         #END_CONSTRUCTOR
         pass
-
 
     def queue_status(self, ctx, params):
         """
@@ -59,7 +55,8 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN queue_status
-        output = self.cq.get_saved_queue_stats()
+        cq = CondorQueueInfo(self.config)
+        output = cq.get_saved_queue_stats()
         #END queue_status
 
         # At some point might do deeper type checking...
@@ -77,7 +74,8 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN job_status
-        output = self.cq.get_saved_job_stats(ctx)
+        cq = CondorQueueInfo(self.config)
+        output = cq.get_saved_job_stats(ctx)
         #END job_status
 
         # At some point might do deeper type checking...
@@ -95,7 +93,8 @@ class condor_stats:
         # ctx is the context object
         # return variables are: output
         #BEGIN condor_userprio_all
-        output = self.cq.get_saved_condor_userprio_all(ctx)
+        cq = CondorQueueInfo(self.config)
+        output = cq.get_saved_condor_userprio_all(ctx)
         #END condor_userprio_all
 
         # At some point might do deeper type checking...

@@ -195,6 +195,13 @@ class CondorQueueInfo:
         jobs_by_status = self._get_jobs_by_status(condor_q_data)
         client_groups = defaultdict(lambda: defaultdict(int))
 
+        # Grab all clientgroups based on the queues
+        # Add zeroed out stats for unavailable stats
+        for cg in slot_stats.keys():
+            for code in job_status_codes.values():
+                client_groups[cg][code] = 0
+
+
         for status in jobs_by_status.keys():
             jobs = jobs_by_status[status]
             for job in jobs:
@@ -202,12 +209,7 @@ class CondorQueueInfo:
                     client_group = self._get_client_group(job)
                     client_groups[client_group][status] += 1
 
-        # Grab all clientgroups based on the queues
-        # Add zeroed out stats for unavailable stats
-        for cg in slot_stats.keys():
-            for code in job_status_codes.values():
-                if str(code) not in client_groups[cg]:
-                    client_groups[cg][code] = 0
+
 
         return client_groups
 
@@ -309,11 +311,12 @@ class CondorQueueInfo:
             if job_info['JobStatus'] == 4:
                 continue
 
+            job_info['CLIENTGROUP'] = self._get_client_group(job)
+            cg = job_info['CLIENTGROUP']
+
             # Find jobs ahead for queued jobs
             job_info['JobsAhead'] = 0
             if job_info['JobStatus'] == 1:
-                job_info['CLIENTGROUP'] = self._get_client_group(job)
-                cg = job_info['CLIENTGROUP']
                 job_info['JobsAhead'] = queue_stats[cg]['Idle']
 
             # Possibly remove these to save space in json return object

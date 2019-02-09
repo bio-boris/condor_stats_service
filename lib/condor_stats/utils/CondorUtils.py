@@ -50,21 +50,13 @@ class CondorQueueInfo:
 
     def get_auth_client(self) -> KBaseAuth:
         if self.auth is None:
-            config = self.config
-            if 'auth-service-url' in config:
-                auth_service_url = config['auth-service-url']
-            else:
-                auth_service_url = config['auth_service_url']
+            auth_service_url = self.config['auth-service-url']
             self.auth = KBaseAuth(auth_service_url)
         return self.auth
 
     def get_catalog_client(self, ctx) -> Catalog:
         if self.catalog_client is None:
-            config = self.config
-            if 'kbase-endpoint' in config:
-                catalog_service_url = config['kbase-endpoint'] + "/catalog"
-            else:
-                catalog_service_url = config['kbase_endpoint'] + "/catalog"
+            catalog_service_url = self.config['kbase-endpoint'] + "/catalog"
             self.catalog_client = Catalog(url=catalog_service_url)
         return self.catalog_client
 
@@ -87,10 +79,15 @@ class CondorQueueInfo:
     def load_config() -> dict:
         retconfig = {}
         config = ConfigParser()
-        config.read("/kb/module/work/config.properties")
-        for nameval in config.items('condor_stats' or 'global'):
+        config.read("/kb/module/deploy.cfg")
+
+        heading = 'condor_stats'
+        if 'global' in config.keys():
+            heading = 'global'
+
+        for nameval in config.items(heading):
             retconfig[nameval[0]] = nameval[1]
-        retconfig['auth-service-url'] = retconfig['auth_service_url']
+
         return retconfig
 
     def __init__(self, config=None):

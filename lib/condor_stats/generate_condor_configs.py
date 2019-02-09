@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-
 import logging
 import os
 from utils.CondorUtils import CondorQueueInfo
-
 
 logging.info("About to setup condor")
 condor_config_dir = "/etc/condor"

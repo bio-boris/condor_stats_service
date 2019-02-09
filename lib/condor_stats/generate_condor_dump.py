@@ -1,6 +1,12 @@
 #!/usr/bin/env python
-from utils.CondorUtils import CondorQueueInfo
 from datetime import datetime
+
+from utils.CondorUtils import CondorQueueInfo
+
+"""
+This script dumps the current state of condor into the data store
+"""
+
 
 def main():
     cu = CondorQueueInfo()

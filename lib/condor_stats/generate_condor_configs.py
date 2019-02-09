@@ -21,7 +21,7 @@ environments = {'https://ci.kbase.us/services': 'CI',
                 'https://kbase.us/services': 'PROD'}
 
 endpoint = config.get('kbase-endpoint', config.get('kbase_endpoint'))
-env = environments[endpoint]
+env = environments.get(environments[endpoint], environments[endpoint] + "/")
 
 schedd_host = os.environ.get(f"KBASE_SECURE_CONFIG_PARAM_SCHEDD_HOST_{env}", "kbase@ci-dock")
 condor_host = os.environ.get(f"KBASE_SECURE_CONFIG_PARAM_CONDOR_HOST_{env}", "ci.kbase.us:9618")

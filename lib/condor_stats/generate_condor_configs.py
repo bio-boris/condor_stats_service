@@ -4,8 +4,6 @@ import logging
 import os
 from utils.CondorUtils import CondorQueueInfo
 
-# TODO USE ENV VARIABLES
-
 
 logging.info("About to setup condor")
 condor_config_dir = "/etc/condor"

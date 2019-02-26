@@ -57,7 +57,7 @@ class CondorQueueInfo:
     def get_catalog_client(self, ctx) -> Catalog:
         if self.catalog_client is None:
             catalog_service_url = self.config['kbase-endpoint'] + "/catalog"
-            self.catalog_client = Catalog(url=catalog_service_url)
+            self.catalog_client = Catalog(url=catalog_service_url, token=ctx['token'])
         return self.catalog_client
 
     def get_username(self, ctx) -> str:

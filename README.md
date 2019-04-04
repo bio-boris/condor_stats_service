@@ -33,3 +33,8 @@ You may find the answers to your questions in our [FAQ](https://kbase.github.io/
 * Two sets of ENV variables are required for appdev/prod
 * Upon startup, dynamic service runs "Generate_data_dump" to dump condor_q data into service.
 * A cronjob runs to generate fresh data every 5 minutes (configurable with CRONJOB_RUN_FREQUENCY_SECONDS)
+
+# Testing
+docker build . -t test/condor_stats:latest
+export condor_password="ci's password
+"

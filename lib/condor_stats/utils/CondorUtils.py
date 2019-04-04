@@ -118,7 +118,7 @@ class CondorQueueInfo:
 
     def get_slot_stats(self) -> dict:
         if self._slot_stats is None:
-            self._slot_stats = self._gen_slot_stats()
+            self._slot_stats = self._gen_slot_stats_partionable()
         return self._slot_stats
 
     def get_queue_stats(self) -> dict:
@@ -156,6 +156,16 @@ class CondorQueueInfo:
             logging.error("Couldn't decode condor_status -json")
 
     @staticmethod
+    def _get_condor_status_partionable() -> dict:
+        command = 'condor_status -constraint \'SlotType == "Partitionable"\' -json -attributes cpus,totalcpus,CLIENTGROUP,state,name,totalmemory,memory,disk,totaldisk'
+        try:
+            return json.loads(subprocess.check_output(command, shell=True).decode())
+        except subprocess.CalledProcessError:
+            logging.error(f"Couldn't check {command}")
+        except json.JSONDecodeError:
+            logging.error("Couldn't decode condor_status -json")
+
+    @staticmethod
     def _get_condor_q() -> dict:
         command = 'condor_q -json'
         try:
@@ -164,6 +174,25 @@ class CondorQueueInfo:
             logging.error(f"Couldn't check {command}")
         except json.JSONDecodeError:
             logging.error("Couldn't decode condor_q -json")
+
+    def _gen_slot_stats_partionable(self) -> dict:
+        """
+        Calculate number of cpus in use versus available per queue
+        :return:
+        """
+        condor_status_data = self._get_condor_status_partionable()
+        slots = defaultdict(lambda: defaultdict(int))  # type: Dict[str, Dict[str, int]]
+
+        for item in condor_status_data:
+            cg = item['CLIENTGROUP']
+            total_cpus = item['totalcpus']
+            cpus_left = item['cpus']
+            cpus_in_use = total_cpus - cpus_left
+            slots[cg]['total_slots'] += total_cpus
+            slots[cg]['used_slots'] += cpus_in_use
+            slots[cg]['free_slots'] += cpus_left
+
+        return slots
 
     def _gen_slot_stats(self) -> dict:
         condor_status_data = self._get_condor_status()

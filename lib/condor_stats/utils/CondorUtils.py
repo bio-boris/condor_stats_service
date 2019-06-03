@@ -337,7 +337,7 @@ class CondorQueueInfo:
                         'CpusProvisioned', 'CPUsUsage', 'CumulativeRemoteSysCpu',
                         'CumulativeRemoteUserCpu', 'MemoryUsage', 'JobStatus',
                         'kb_function_name', 'kb_module_name', 'CLIENTGROUP', 'RemoteHost',
-                        'LastRejMatchReason']
+                        'LastRejMatchReason', 'HoldReason', 'HoldReasonCode', 'LastHoldReason', 'LastHoldReasonCode', 'NumSystemHolds']
 
         queue_stats = self.get_queue_stats()
 

@@ -331,7 +331,11 @@ class CondorQueueInfo:
         """
         condor_q_data = self.get_condor_q_data()
 
-        summary_keys = ['AcctGroup', 'ClusterId', 'JobBatchName', 'kb_app_id', 'QDate', 'JobStatus',
+        summary_keys = ['AcctGroup', 'AccountingGroup', 'ClusterId', 'JobBatchName', 'kb_app_id',
+                        'QDate', 'JobStartDate', 'JobCurrentStartDate',
+                        'JobCurrentStartExecutingDate', 'RemoteWallClockTime',
+                        'CpusProvisioned', 'CPUsUsage', 'CumulativeRemoteSysCpu',
+                        'CumulativeRemoteUserCpu', 'MemoryUsage', 'JobStatus',
                         'kb_function_name', 'kb_module_name', 'CLIENTGROUP', 'RemoteHost',
                         'LastRejMatchReason']
 
@@ -346,6 +350,9 @@ class CondorQueueInfo:
 
             if job_info['JobStatus'] == 4:
                 continue
+
+            job_info["AcctGroup"] = job_info["AccountingGroup"]
+            del job_info["AccountingGroup"]
 
             job_info['CLIENTGROUP'] = self._get_client_group(job)
             cg = job_info['CLIENTGROUP']

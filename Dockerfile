@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y vim wget \
 && echo "deb http://research.cs.wisc.edu/htcondor/debian/8.8/stretch stretch contrib" >> /etc/apt/sources.list \
 && apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y condor && rm -rf /etc/condor/*
 
-RUN mkdir -p /data/db && apt-get install -y mongodb && pip install htcondor pymongo
+RUN sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 4B7C549A058F8B6B && echo "deb http://repo.mongodb.org/apt/debian "$(lsb_release -sc)"/mongodb-org/4.2 main" | sudo tee /etc/apt/sources.list.d/mongodb.list && apt update -y && apt install -y mongodb-org 
+
+RUN mkdir -p /data/db && pip install htcondor pymongo
 
 
 # -----------------------------------------

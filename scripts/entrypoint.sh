@@ -9,7 +9,7 @@ if [ -f ./work/token ] ; then
 fi
 
 if [ $# -eq 0 ] ; then
-  service mongodb start
+  /usr/bin/mongod --config /etc/mongod.conf & 
   python /kb/module/lib/condor_stats/generate_condor_configs.py
   bash /kb/module/lib/condor_stats/cronjob.sh &
   sh ./scripts/start_server.sh

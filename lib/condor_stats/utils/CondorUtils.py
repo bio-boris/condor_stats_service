@@ -336,7 +336,7 @@ class CondorQueueInfo:
                         'JobCurrentStartExecutingDate', 'RemoteWallClockTime',
                         'CpusProvisioned', 'CPUsUsage', 'CumulativeRemoteSysCpu',
                         'CumulativeRemoteUserCpu', 'MemoryUsage', 'JobStatus',
-                        'kb_function_name', 'kb_module_name', 'CLIENTGROUP', 'RemoteHost',
+                        'kb_function_name', 'kb_module_name', 'CLIENTGROUP', 'RemoteHost', 'LastRemoteHost'
                         'LastRejMatchReason', 'HoldReason', 'HoldReasonCode', 'LastHoldReason',
                         'LastHoldReasonCode', 'NumSystemHolds']
 

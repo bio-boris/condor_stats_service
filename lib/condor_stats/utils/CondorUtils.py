@@ -147,7 +147,7 @@ class CondorQueueInfo:
 
     @staticmethod
     def _get_condor_status() -> dict:
-        command = 'condor_status -json -attribute CLIENTGROUP,State,Name,Memory,Cpus'
+        command = 'condor_status -json -attribute KB_CLIENTGROUP,State,Name,Memory,Cpus'
         try:
             return json.loads(subprocess.check_output(command, shell=True).decode())
         except subprocess.CalledProcessError:

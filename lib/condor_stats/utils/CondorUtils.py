@@ -157,7 +157,7 @@ class CondorQueueInfo:
 
     @staticmethod
     def _get_condor_status_partionable() -> dict:
-        command = 'condor_status -constraint \'SlotType == "Partitionable"\' -json -attributes cpus,totalcpus,KB_CLIENTGROUP,state,name,totalmemory,memory,disk,totaldisk'
+        command = 'condor_status -constraint \'SlotType == "Partitionable"\' -json -attributes cpus,totalcpus,CLIENTGROUP,state,name,totalmemory,memory,disk,totaldisk'
         try:
             return json.loads(subprocess.check_output(command, shell=True).decode())
         except subprocess.CalledProcessError:

@@ -157,7 +157,7 @@ class CondorQueueInfo:
 
     @staticmethod
     def _get_condor_status_partionable() -> dict:
-        command = 'condor_status -constraint \'SlotType == "Partitionable"\' -json -attributes cpus,totalcpus,CLIENTGROUP,state,name,totalmemory,memory,disk,totaldisk'
+        command = 'condor_status -constraint \'SlotType == "Partitionable"\' -json -attributes cpus,totalcpus,KB_CLIENTGROUP,state,name,totalmemory,memory,disk,totaldisk'
         try:
             return json.loads(subprocess.check_output(command, shell=True).decode())
         except subprocess.CalledProcessError:
@@ -184,7 +184,7 @@ class CondorQueueInfo:
         slots = defaultdict(lambda: defaultdict(int))  # type: Dict[str, Dict[str, int]]
 
         for item in condor_status_data:
-            cg = item['CLIENTGROUP']
+            cg = item['KB_CLIENTGROUP']
             total_cpus = item['totalcpus']
             cpus_left = item['cpus']
             cpus_in_use = total_cpus - cpus_left
@@ -199,7 +199,7 @@ class CondorQueueInfo:
         slots = defaultdict(lambda: defaultdict(int))  # type: Dict[str, Dict[str, int]]
 
         for item in condor_status_data:
-            cg = item['CLIENTGROUP']
+            cg = item['KB_CLIENTGROUP']
             status = item['State']
             slots[cg]['total_slots'] += 1
             if status == 'Claimed':
@@ -234,9 +234,8 @@ class CondorQueueInfo:
         for status in jobs_by_status.keys():
             jobs = jobs_by_status[status]
             for job in jobs:
-                if 'Requirements' in job:
-                    client_group = self._get_client_group(job)
-                    client_groups[client_group][status] += 1
+                client_group = job.get('KB_CLIENTGROUP')
+                client_groups[client_group][status] += 1
 
         return client_groups
 
@@ -336,7 +335,7 @@ class CondorQueueInfo:
                         'JobCurrentStartExecutingDate', 'RemoteWallClockTime',
                         'CpusProvisioned', 'CPUsUsage', 'CumulativeRemoteSysCpu',
                         'CumulativeRemoteUserCpu', 'MemoryUsage', 'JobStatus',
-                        'kb_function_name', 'kb_module_name', 'CLIENTGROUP', 'RemoteHost', 'LastRemoteHost'
+                        'kb_function_name', 'kb_module_name', 'KB_CLIENTGROUP', 'RemoteHost', 'LastRemoteHost'
                         'LastRejMatchReason', 'HoldReason', 'HoldReasonCode', 'LastHoldReason',
                         'LastHoldReasonCode', 'NumSystemHolds']
 
@@ -355,8 +354,7 @@ class CondorQueueInfo:
             job_info["AcctGroup"] = job_info["AccountingGroup"]
             del job_info["AccountingGroup"]
 
-            job_info['CLIENTGROUP'] = self._get_client_group(job)
-            cg = job_info['CLIENTGROUP']
+            cg = job_info['KB_CLIENTGROUP']
 
             # Find jobs ahead for queued jobs
             job_info['JobsAhead'] = 0

@@ -184,7 +184,7 @@ class CondorQueueInfo:
         slots = defaultdict(lambda: defaultdict(int))  # type: Dict[str, Dict[str, int]]
 
         for item in condor_status_data:
-            cg = item['KB_CLIENTGROUP']
+            cg = item['CLIENTGROUP']
             total_cpus = item['totalcpus']
             cpus_left = item['cpus']
             cpus_in_use = total_cpus - cpus_left

@@ -2,7 +2,6 @@ import datetime
 import json
 import logging
 import os
-import re
 import subprocess
 from collections import defaultdict
 from configparser import ConfigParser
@@ -210,14 +209,6 @@ class CondorQueueInfo:
         return slots
 
     @staticmethod
-    def _get_client_group(job) -> str:
-        try:
-            return re.search('CLIENTGROUP == (".+?")', job['Requirements']).group(1).replace('"',
-                                                                                             '')
-        except AttributeError:
-            return 'unknown'
-
-    @staticmethod
     def _get_jobs_by_status(data) -> defaultdict(list):
         jobs = defaultdict(list)
         for item in data:
@@ -235,7 +226,7 @@ class CondorQueueInfo:
             jobs = jobs_by_status[status]
             for job in jobs:
                 if 'Requirements' in job:
-                    client_group = self._get_client_group(job)
+                    client_group = job.get('KB_CLIENTGROUP', 'Unknown')
                     client_groups[client_group][status] += 1
 
         return client_groups
@@ -336,7 +327,8 @@ class CondorQueueInfo:
                         'JobCurrentStartExecutingDate', 'RemoteWallClockTime',
                         'CpusProvisioned', 'CPUsUsage', 'CumulativeRemoteSysCpu',
                         'CumulativeRemoteUserCpu', 'MemoryUsage', 'JobStatus',
-                        'kb_function_name', 'kb_module_name', 'CLIENTGROUP', 'RemoteHost', 'LastRemoteHost'
+                        'kb_function_name', 'kb_module_name', 'CLIENTGROUP', 'KB_CLIENTGROUP', 'RemoteHost',
+                        'LastRemoteHost'
                         'LastRejMatchReason', 'HoldReason', 'HoldReasonCode', 'LastHoldReason',
                         'LastHoldReasonCode', 'NumSystemHolds']
 
@@ -355,7 +347,7 @@ class CondorQueueInfo:
             job_info["AcctGroup"] = job_info["AccountingGroup"]
             del job_info["AccountingGroup"]
 
-            job_info['CLIENTGROUP'] = self._get_client_group(job)
+            job_info['CLIENTGROUP'] = job_info.get('KB_CLIENTGROUP', 'Unknown Job Client Group')
             cg = job_info['CLIENTGROUP']
 
             # Find jobs ahead for queued jobs

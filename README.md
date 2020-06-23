@@ -35,6 +35,18 @@ You may find the answers to your questions in our [FAQ](https://kbase.github.io/
 * A cronjob runs to generate fresh data every 5 minutes (configurable with CRONJOB_RUN_FREQUENCY_SECONDS)
 
 # Testing
-docker build . -t test/condor_stats:latest
-export condor_password="ci's password
-"
+docker build . -t test/condor_stats:latest; docker run -p 5000:5000 -e AUTH_SERVICE_URL=https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login -e KBASE_ENDPOINT=https://ci.kbase.us/services -e KBASE_SECURE_CONFIG_PARAM_POOL_PASSWORD_CI="" test/condor_stats:latest
+
+The config should look like
+
+[condor_stats]
+kbase-endpoint = https://ci.kbase.us/services
+job-service-url = https://ci.kbase.us/services/userandjobstate
+workspace-url = https://ci.kbase.us/services/ws
+shock-url = https://ci.kbase.us/services/shock-api
+handle-service-url = https://ci.kbase.us/services/handle_service
+srv-wiz-url = https://ci.kbase.us/services/service_wizard
+njsw-url = https://ci.kbase.us/services/njs_wrapper
+auth-service-url = https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login
+auth-service-url-allow-insecure = false
+scratch = /kb/module/work/tmp

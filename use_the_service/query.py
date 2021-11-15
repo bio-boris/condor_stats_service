@@ -30,7 +30,7 @@ def prBlack(prt): print("\033[98m {}\033[00m".format(prt))
 # URL TAKEN FROM https://ci.kbase.us/#catalog/services
 ci_url = "https://ci.kbase.us:443/dynserv/53c70d92f7830e2eb62f48171600ac56ebd090bd.condor-stats"
 # URL TAKEN FROM https://narrative.kbase.us/#catalog/services
-prod_url = "https://kbase.us:443/dynserv/53c70d92f7830e2eb62f48171600ac56ebd090bd.condor-stats"
+prod_url = "https://kbase.us/dynserv/53c70d92f7830e2eb62f48171600ac56ebd090bd.condor-stats"
 url_of_stats_service = prod_url
 my_token = "<YOUR_TOKEN_GOES_HERE>"
 
